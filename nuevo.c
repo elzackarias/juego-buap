@@ -261,7 +261,7 @@ int main() {
                 printf("Se generaron %d meteoros \n", peligros);
                 sleep(2);
                 for (cont = 0; cont < peligros; cont++) {
-                    dist = (rand() % 301) + 100;  // distancia entre 100 y 400
+                    dist = (rand() % 231) + 170;  // distancia entre 170 y 400
                     vel = rand() % 1001 + 1500;   // velocidad 1500 a 2500
                     printf("******************\n* Aparecio el meteoro %d *\n******************\n", cont + 1);
                     printf("Velocidad %1.0f km/h \n", vel);
@@ -404,6 +404,8 @@ int main() {
                         }
                     }
                     printf("*************************\n Hoyo Negro: %d \n", i + 1);
+                    printf("Velocidad %1.0f km/h \n", velN3[i]);
+                    printf("Distancia %d km \n", disN3[i]);
                     sleep(3);
                     switch (opc) {
                         case '1':

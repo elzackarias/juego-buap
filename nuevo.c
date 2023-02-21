@@ -386,7 +386,7 @@ int main() {
                 peligros = rand() % 4 + 10;                    //* genera de 10 a 13 hoyo
                 for (i = 0; i < peligros; i++) {               // Primero se almacenan las distancias y las velocidades de c/hoyo negro con el mismo indice
                     velN3[i] = 2500 + rand() % (4000 - 2500);  //* de 2500 a 4000 km/h
-                    disN3[i] = rand() % 301 + 250;             // de 250 a 550 km
+                    disN3[i] = rand() % 251 + 300;             // de 300 a 550 km
                 }
                 printf("\nCruzaras %d Hoyos Negros \n", peligros);
                 for (i = 0; i < peligros; i++) {
@@ -404,8 +404,6 @@ int main() {
                         }
                     }
                     printf("*************************\n Hoyo Negro: %d \n", i + 1);
-                    printf("Velocidad %1.0f km/h \n", velN3[i]);
-                    printf("Distancia %d km \n", disN3[i]);
                     sleep(3);
                     switch (opc) {
                         case '1':
@@ -415,7 +413,7 @@ int main() {
                             printf("Evadiste el hoyo negro %d tu distacia fue %d km y tu velocidad fue de %1.0f km/h \n ", i + 1, disN3[i], velN3[i]);
                             break;
                         case '3':
-                            printf(" Puedes destruir el Hoyo Negro \n");
+                            printf(" Puedes destruir el Hoyo Negro \n Tu distacia fue %d km \n Tu velocidad alcanzada fue de %1.0f km/h \n",disN3[i], velN3[i]);
                             printf("Escriba 'SI' para destruir o 'NO' para evadirlo \n");
                             do {
                                 scanf("%s", cad);
@@ -453,11 +451,11 @@ int main() {
                             } while (opcion == 3);
                             break;
                         case '4':
-                            printf(" Tu distacia no fue la necesaria\n Te absorbera el hoyo negro en\n 3\n 2\n 1\n .....\n �PERDISTE! \n Intentalo nuevamente\n");
+                            printf(" Tu distacia fue %d km \n Pero no fue la necesaria\n Te absorbera el hoyo negro en\n 3\n 2\n 1\n .....\n PERDISTE! \n Intentalo nuevamente\n",disN3[i]);
                             return 0;
                     }
                     if ((i % 4) == 0) {  // Los objetos aparecen solo si i es multiplo de 4
-                        printf("Te has encontrado un objeto de interes \n");
+                        printf("\n °° Te has encontrado un objeto de interes \n");
                         printf("Escriba 'SI' para destruir o 'NO' para evadirlo \n");
                         do {
                             scanf("%s", cad);
@@ -468,7 +466,7 @@ int main() {
                             if (opcion == 1) {
                                 disO = rand() % 5;
                                 if (disO >= 0 && disO <= 3) {
-                                    printf("Ohh!!!!!, has perdiste 70 capsulas de vida \nGanaste 15 balas");
+                                    printf("Ohh!!!!!, has perdiste 70 capsulas de vida \nGanaste 15 balas \n");
                                     vida -= 70;
                                     balas += 15;
                                 } else {

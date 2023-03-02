@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-// #include <conio.h>
+//#include <conio.h>
 #include <unistd.h>  //Sirve para el sleep()
 int main() {
     srand(time(NULL));  // se utiliza para que se produzca una secuencia de números aleatorios diferente
@@ -261,11 +261,14 @@ int main() {
                 printf("Se generaron %d meteoros \n", peligros);
                 sleep(2);
                 for (cont = 0; cont < peligros; cont++) {
-                    dist = (rand() % 231) + 170;  // distancia entre 170 y 400
+                    dist = (rand() % 216) + 185;  // distancia entre 185 y 400
                     vel = rand() % 1001 + 1500;   // velocidad 1500 a 2500
-                    printf("******************\n* Aparecio el meteoro %d *\n******************\n", cont + 1);
-                    printf("Velocidad %1.0f km/h \n", vel);
-                    printf("Distancia %d km \n", dist);
+                    sleep(2);
+                    printf("\n******************\n* Aparecio el meteoro %d *\n******************\n", cont + 1);
+                    sleep(2);
+                    printf(" \n ------ Velocidad %1.0f km/h ------\n", vel);
+                    sleep(2);
+                    printf("\n --- Distancia %d km --- \n", dist);
                     if (dist >= 350) {
                         contast += 10;
                         printf("Has esquivado el meteoro,\n Ganaste 10 asteroides destruidos\n");
@@ -273,10 +276,10 @@ int main() {
                     } else {
                         if (dist > 200 && dist < 350) {
                             if (vel > 2000) {
-                                printf("Has evadido el meteoro, \n Ganaste 15 asteroides destruidos\n");
+                                printf("Has evadido el meteoro :), \nGanaste 15 asteroides destruidos\n");
                                 contast += 15;
                             } else {
-                                printf("Puedes destruir el meteoro \n");
+                                printf("\nPuedes destruir el meteoro \n");
                                 printf("Escriba 'SI' para destruir o 'NO' para evadirlo \n");
                                 do {
                                     scanf("%s", cad);
@@ -292,9 +295,9 @@ int main() {
                                             vida -= vidap;
                                             contast += 20;
                                             sleep(2);
-                                            printf("Destruiste el meteoro con sus asteroides\n**************************\n");
-                                            printf("Perdiste %d balas y %d vidas \n", aleat1 * 3, vidap);
-                                            printf("Te quedan %d vidas y %d balas\n", vida, balas);
+                                            printf("Destruiste el meteoro con sus asteroides\n");
+                                            printf("Perdiste:\n %d Balas \n %d Vidas \n", aleat1 * 3, vidap);
+                                            printf("Te Quedan: \n %d Vidas \n %d Balas\n", vida, balas);
                                             sleep(2);
                                         } else {
                                             printf("No lo puedes destruir, insuficiencia de balas o vidas\n");
@@ -305,7 +308,7 @@ int main() {
                                         cad2[2] = '\0';
                                         opcion = 2 + strcmp(cad, cad2);
                                         if (opcion == 2) {
-                                            printf("Decidiste no destruirlo. Contin ua el viaje :)\n");
+                                            printf("Decidiste no destruirlo. Continua el viaje :)\n");
                                         } else {
                                             printf("Escribe la opcion correcta\n");
                                             opcion = 3;
@@ -315,7 +318,7 @@ int main() {
                             }
                         } else {
                             sleep(2);
-                            printf("No pudiste esquivar el meteoro, distancia insuficiente \nImpactaras en: \n");
+                            printf("\n No pudiste esquivar el meteoro, distancia insuficiente \nImpactaras en: \n");
                             printf("3\n");
                             sleep(1);
                             printf("2\n");
@@ -331,7 +334,8 @@ int main() {
                         }
                     }
                     if ((cont % 4) == 0) {  // Se generan los objetos solo cuando el meteoro (cont) es multiplo de 4
-                        printf("Aparecio un objeto de interes\n");
+                        sleep(1);
+                        printf("\n °°°°Aparecio un objeto de interes\n");
                         dis = rand() % 3501;      // Se genera num. aleatorio entre 0 y 3.5km
                         dis = (float)dis / 1000;  // como rand() no genera num decimales, primero generamos un num entre 0 y 3500 y lo dividimos entre 1000
                         printf("Escriba 'SI' para tomarlo o 'NO' para esquivarlo \n");
@@ -343,11 +347,13 @@ int main() {
                             opcion = 1 + strcmp(cad, cad1);
                             if (opcion == 1) {
                                 if (dis >= 0 && dis <= 2.5) {  // Para tomar el objeto la distancia debe estar entre 0 y 2.5km
-                                    printf("Ouh!, tomaste el objeto de interes \n Perdiste 60 capsulas de vida\nGanaste 10 balas y 5 asteroides destruidos\n");
+                                    sleep(1);
+                                    printf("\nOuh!, tomaste el objeto de interes\nPerdiste: \n60 capsulas de vida\nGanaste: \n10 Balas \n 5 Asteroides destruidos\n");
                                     vida -= 60;
                                     balas += 10;
                                     contast += 5;
                                 } else {
+                                    sleep(1);
                                     printf("Lo siento! \n no conseguiste la distancia necesaria :(\n");
                                 }
                             } else {
@@ -356,7 +362,7 @@ int main() {
                                 cad2[2] = '\0';
                                 opcion = 2 + strcmp(cad, cad2);
                                 if (opcion == 2) {
-                                    printf("Esquivaste el objeto de interes.\n Continuando el viaje \n");
+                                    printf("\nEsquivaste el objeto de interes.\nContinuando el viaje \n");
                                 } else {
                                     printf("Escribe la opcion correcta\n");
                                     opcion = 3;
@@ -366,7 +372,8 @@ int main() {
                     }
                 }
                 /*Resultado del juego*/
-                printf("Vidas totales %d  \n", vida);
+                sleep(2);
+                printf("\nVidas totales %d  \n", vida);
                 printf("Balas finales %d \n", balas);
                 printf("Asteroides destruidos %d  \n", contast);
                 if ((balas >= 5000) && (vida >= 700) && (contast >= 100)) {  // Se verifican las condiciones para poder pasar al siguiente nivel
@@ -380,13 +387,14 @@ int main() {
                 }
                 break;
             case 3:
-                printf("/-----------------------------------/\n");
+                sleep(2);
+                printf("\n\n\n/-----------------------------------/\n");
                 printf("/**NIVEL 3:**\n");
                 printf("/-----------------------------------/\n");
                 peligros = rand() % 4 + 10;                    //* genera de 10 a 13 hoyo
                 for (i = 0; i < peligros; i++) {               // Primero se almacenan las distancias y las velocidades de c/hoyo negro con el mismo indice
                     velN3[i] = 2500 + rand() % (4000 - 2500);  //* de 2500 a 4000 km/h
-                    disN3[i] = rand() % 251 + 300;             // de 300 a 550 km
+                    disN3[i] = rand() % 221 + 330;             // de 330 a 550 km
                 }
                 printf("\nCruzaras %d Hoyos Negros \n", peligros);
                 for (i = 0; i < peligros; i++) {
@@ -403,17 +411,18 @@ int main() {
                             opc = '4';
                         }
                     }
-                    printf("*************************\n Hoyo Negro: %d \n", i + 1);
+                    sleep(2);
+                    printf("\n*************************\n Hoyo Negro: %d \n", i + 1);
                     sleep(3);
                     switch (opc) {
                         case '1':
-                            printf("Te desviaste el hoyo negro %d, ya que tu distancia entre tu y el hoyo fue de %d km \n ", i + 1, disN3[i]);
+                            printf("\nTe desviaste el Hoyo Negro %d, ya que tu distancia entre tu y el hoyo fue de %d km \n ", i + 1, disN3[i]);
                             break;
                         case '2':
-                            printf("Evadiste el hoyo negro %d tu distacia fue %d km y tu velocidad fue de %1.0f km/h \n ", i + 1, disN3[i], velN3[i]);
+                            printf("\nEvadiste el hoyo negro %d tu distacia fue %d km y tu velocidad fue de %1.0f km/h \n ", i + 1, disN3[i], velN3[i]);
                             break;
                         case '3':
-                            printf(" Puedes destruir el Hoyo Negro \n Tu distacia fue %d km \n Tu velocidad alcanzada fue de %1.0f km/h \n",disN3[i], velN3[i]);
+                            printf(" \nPuedes destruir el Hoyo Negro \n Tu distacia fue %d km \n Tu velocidad alcanzada fue de %1.0f km/h \n",disN3[i], velN3[i]);
                             printf("Escriba 'SI' para destruir o 'NO' para evadirlo \n");
                             do {
                                 scanf("%s", cad);
@@ -422,7 +431,8 @@ int main() {
                                 cad1[2] = '\0';
                                 opcion = 1 + strcmp(cad, cad1);
                                 if (opcion == 1) {
-                                    printf("Atacaras el hoyo negro \n");
+                                    printf("\nAtacaras el hoyo negro \n");
+                                    sleep(2);
                                     if (balas >= 25 && vida >= 250) {
                                         aleat1 = 5 + rand() % (10 - 5);  // Generando de 5 a 9 disparos
                                         balas -= aleat1 * 5;             // Por cada disparo perderas 5 balas
@@ -430,8 +440,10 @@ int main() {
                                         vida -= vidap;
                                         contho++;  // Contador de hoyos negros destruidos
                                         printf("Destruiste el hoyo negro \n");
-                                        printf("Perdiste %d balas y %d de vida \n", aleat1 * 5, vidap);
-                                        printf("Te quedan %d balas y % de vida \n", balas, vida);
+                                        sleep(1);
+                                        printf("Perdiste: \n %d Balas\n  %d Vida \n", aleat1 * 5, vidap);
+                                        sleep(1);
+                                        printf("------\nTe quedan:\n%d Balas\n%d Vida \n", balas, vida);
                                     } else {
                                         printf("Insuficiente de balas o vida \n");
                                     }
@@ -451,7 +463,21 @@ int main() {
                             } while (opcion == 3);
                             break;
                         case '4':
-                            printf(" Tu distacia fue %d km \n Pero no fue la necesaria\n Te absorbera el hoyo negro en\n 3\n 2\n 1\n .....\n PERDISTE! \n Intentalo nuevamente\n",disN3[i]);
+                            printf(" Tu distacia fue %d km \n",disN3[i]);
+                            sleep(2);
+                            printf("No pudiste esquivar el Hoyo Negro, distancia insuficiente \nImpactaras en: \n");
+                            printf("3\n");
+                            sleep(1);
+                            printf("2\n");
+                            sleep(1);
+                            printf("1\n");
+                            sleep(1);
+                            printf("...\n");
+                            sleep(4);
+                            // Grafico de bomba
+                            printf("                             ____\n                     __,-~~/~    `---.\n                   _/_,---(      ,    )\n               __ /        <    /   )  \\___\n- ------===;;;'====------------------===;;;===----- -  -\n                  \\/  ~\"~\"~\"~\"~\"~\\~\"~)~\"/\n                  (_ (   \\  (     >    \\)\n                   \\_( _ <         >_>'\n                      ~ `-i' ::>|--\"\n                          I;|.|.|\n                         <|i::|i|`.\n                        (` ^'\" ' \")\n");
+                            printf("Has perdido el juego :c\n");
+                            
                             return 0;
                     }
                     if ((i % 4) == 0) {  // Los objetos aparecen solo si i es multiplo de 4

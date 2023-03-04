@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-//#include <conio.h>
+// #include <conio.h>
 #include <unistd.h>  //Sirve para el sleep()
 int main() {
     srand(time(NULL));  // se utiliza para que se produzca una secuencia de números aleatorios diferente
@@ -197,11 +197,15 @@ int main() {
                         aleat2 = rand() % 2000 + 1000;  // Generando distancia de la nave al objeto de 1000m a 3000m
                         if (aleat2 <= 2000) {           // El jugador podra tomar el objeto si su distancia con el objeto es menor o igual a 2000
                             printf("No sabras que es el objeto hasta que lo tomes\n");
-                            printf("Desea tomar el objeto? Si es asi, perderas 50 capsulas de vida. Escriba 1 o 0 (si o no):\n");
-                            sleep(5);
-                            do {  // Validando respuesta del usuario
-                                scanf("%d", &ans);
-                                if (ans == 1) {  // Si tomo el objeto
+                            printf("Desea tomar el objeto? Si es asi, perderas 50 capsulas de vida. Escriba SI o NO):\n");
+                            sleep(4);
+                            do {
+                                scanf("%s", cad);
+                                cad1[0] = 'S';
+                                cad1[1] = 'I';
+                                cad1[2] = '\0';
+                                opcion = 1 + strcmp(cad, cad1);
+                                if (opcion == 1) {
                                     printf("Decidiste tomar el objeto\n");
                                     sleep(3);
                                     if (aleat1 == 0) {              // Objeto 1: Propulsor
@@ -218,19 +222,24 @@ int main() {
                                     vida -= 50;
                                     printf("Perdiste 50 capsulas de vida por agarrar el objeto\n");
                                 } else {
-                                    if (ans == 0)
+                                    cad2[0] = 'N';
+                                    cad2[1] = 'O';
+                                    cad2[2] = '\0';
+                                    opcion = 2 + strcmp(cad, cad2);
+                                    if (opcion == 2) {
                                         printf("Decidiste no tomar el objeto\n");
-                                    else {
-                                        printf("Por favor escribe 0 o 1, no otros numeros\n");
-                                        sleep(2);
-                                        ans = 3;
+                                    } else {
+                                        printf("Escribe la opcion correcta\n");
+                                        opcion = 3;
                                     }
                                 }
-                            } while (ans == 2);
-                        } else
+                            } while (opcion == 3);
+                        } else {
                             printf("Desgraciadamente estas muy lejos del objeto para poder tomarlo...\n");
-                    } else
+                        }
+                    } else {
                         printf("En tu recorrido no haz encontrado ningun objeto\n");
+                    }
                     sleep(5);
                 }
                 /*Resultado del juego*/
@@ -422,7 +431,7 @@ int main() {
                             printf("\nEvadiste el hoyo negro %d tu distacia fue %d km y tu velocidad fue de %1.0f km/h \n ", i + 1, disN3[i], velN3[i]);
                             break;
                         case '3':
-                            printf(" \nPuedes destruir el Hoyo Negro \n Tu distacia fue %d km \n Tu velocidad alcanzada fue de %1.0f km/h \n",disN3[i], velN3[i]);
+                            printf(" \nPuedes destruir el Hoyo Negro \n Tu distacia fue %d km \n Tu velocidad alcanzada fue de %1.0f km/h \n", disN3[i], velN3[i]);
                             printf("Escriba 'SI' para destruir o 'NO' para evadirlo \n");
                             do {
                                 scanf("%s", cad);
@@ -463,7 +472,7 @@ int main() {
                             } while (opcion == 3);
                             break;
                         case '4':
-                            printf(" Tu distacia fue %d km \n",disN3[i]);
+                            printf(" Tu distacia fue %d km \n", disN3[i]);
                             sleep(2);
                             printf("No pudiste esquivar el Hoyo Negro, distancia insuficiente \nImpactaras en: \n");
                             printf("3\n");
@@ -477,7 +486,7 @@ int main() {
                             // Grafico de bomba
                             printf("                             ____\n                     __,-~~/~    `---.\n                   _/_,---(      ,    )\n               __ /        <    /   )  \\___\n- ------===;;;'====------------------===;;;===----- -  -\n                  \\/  ~\"~\"~\"~\"~\"~\\~\"~)~\"/\n                  (_ (   \\  (     >    \\)\n                   \\_( _ <         >_>'\n                      ~ `-i' ::>|--\"\n                          I;|.|.|\n                         <|i::|i|`.\n                        (` ^'\" ' \")\n");
                             printf("Has perdido el juego :c\n");
-                            
+
                             return 0;
                     }
                     if ((i % 4) == 0) {  // Los objetos aparecen solo si i es multiplo de 4

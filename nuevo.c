@@ -235,7 +235,7 @@ int main() {
                                 }
                             } while (opcion == 3);
                         } else {
-                            printf("Desgraciadamente estas muy lejos del objeto para poder tomarlo...\n");
+                            printf("Desgraciadamente estas muy lejos del objeto (%d km) para poder tomarlo...\n",dist);
                         }
                     } else {
                         printf("En tu recorrido no haz encontrado ningun objeto\n");
@@ -257,7 +257,7 @@ int main() {
                     printf("Oh no... No pudiste ganar debido a que te faltaron puntos... Intentalo de nuevo!\n");
                 sleep(2);
             case 2:
-                printf("/-----------------------------------/\n");
+                printf("\n\n/-----------------------------------/\n");
                 printf("/**NIVEL 2:**\n");
                 printf("/-----------------------------------/\n");
                 if (signivel != 1) {
@@ -305,6 +305,7 @@ int main() {
                                             contast += 20;
                                             sleep(2);
                                             printf("Destruiste el meteoro con sus asteroides\n");
+                                            printf("Realizaste %d disparos\n",aleat1);
                                             printf("Perdiste:\n %d Balas \n %d Vidas \n", aleat1 * 3, vidap);
                                             printf("Te Quedan: \n %d Vidas \n %d Balas\n", vida, balas);
                                             sleep(2);
@@ -363,7 +364,7 @@ int main() {
                                     contast += 5;
                                 } else {
                                     sleep(1);
-                                    printf("Lo siento! \n no conseguiste la distancia necesaria :(\n");
+                                    printf("Lo siento! \n no conseguiste la distancia necesaria (%d km) :(\n",dis);
                                 }
                             } else {
                                 cad2[0] = 'N';
@@ -449,6 +450,7 @@ int main() {
                                         vida -= vidap;
                                         contho++;  // Contador de hoyos negros destruidos
                                         printf("Destruiste el hoyo negro \n");
+                                        printf("Realizaste %d disparos\n",aleat1);
                                         sleep(1);
                                         printf("Perdiste: \n %d Balas\n  %d Vida \n", aleat1 * 5, vidap);
                                         sleep(1);
@@ -505,7 +507,7 @@ int main() {
                                     vida -= 70;
                                     balas += 15;
                                 } else {
-                                    printf("Lo siento no alcanzaste la distancia necesaria \n");
+                                    printf("Lo siento no alcanzaste la distancia necesaria (%d km)\n",disO);
                                 }
                             } else {
                                 cad2[0] = 'N';

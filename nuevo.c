@@ -429,10 +429,10 @@ int main() {
                             printf("\nTe desviaste el Hoyo Negro %d, ya que tu distancia entre tu y el hoyo fue de %d km \n ", i + 1, disN3[i]);
                             break;
                         case '2':
-                            printf("\nEvadiste el hoyo negro %d tu distacia fue %d km y tu velocidad fue de %1.0f km/h \n ", i + 1, disN3[i], velN3[i]);
+                            printf("\nEvadiste el hoyo negro %d tu distancia fue %d km y tu velocidad fue de %1.0f km/h \n ", i + 1, disN3[i], velN3[i]);
                             break;
                         case '3':
-                            printf(" \nPuedes destruir el Hoyo Negro \n Tu distacia fue %d km \n Tu velocidad alcanzada fue de %1.0f km/h \n", disN3[i], velN3[i]);
+                            printf(" \nPuedes destruir el Hoyo Negro \n Tu distancia fue %d km \n Tu velocidad alcanzada fue de %1.0f km/h \n", disN3[i], velN3[i]);
                             printf("Escriba 'SI' para destruir o 'NO' para evadirlo \n");
                             do {
                                 scanf("%s", cad);
@@ -474,7 +474,7 @@ int main() {
                             } while (opcion == 3);
                             break;
                         case '4':
-                            printf(" Tu distacia fue %d km \n", disN3[i]);
+                            printf(" Tu distancia fue %d km \n", disN3[i]);
                             sleep(2);
                             printf("No pudiste esquivar el Hoyo Negro, distancia insuficiente \nImpactaras en: \n");
                             printf("3\n");

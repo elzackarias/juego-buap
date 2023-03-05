@@ -235,7 +235,7 @@ int main() {
                                 }
                             } while (opcion == 3);
                         } else {
-                            printf("Desgraciadamente estas muy lejos del objeto (%d km) para poder tomarlo...\n",dist);
+                            printf("Desgraciadamente estas muy lejos del objeto (%d m) para poder tomarlo...\n",aleat2);
                         }
                     } else {
                         printf("En tu recorrido no haz encontrado ningun objeto\n");

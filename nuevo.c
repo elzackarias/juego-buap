@@ -364,7 +364,7 @@ int main() {
                                     contast += 5;
                                 } else {
                                     sleep(1);
-                                    printf("Lo siento! \n no conseguiste la distancia necesaria (%f km) :(\n",dis);
+                                    printf("Lo siento! \n no conseguiste la distancia necesaria (%1.2f km) :(\n",dis);
                                 }
                             } else {
                                 cad2[0] = 'N';

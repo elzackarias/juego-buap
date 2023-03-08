@@ -12,7 +12,7 @@ int main() {
 
     // letrero inicio
     printf(" ______                  _____   _     _ _       \n|  ___ \\                (____ \\ | |   | | |      \n| | _ | | ____  ____ ___ _   \\ \\| |__ | | |      \n| || || |/ _  |/ ___)___) |   | |  __)| | |      \n| || || ( ( | | |  |___ | |__/ /| |   | | |_____ \n|_||_||_|\\_||_|_|  (___/|_____/ |_|   |_|_______)\n");
-    printf("Bienvenido al juego 'Transportando plantas a marte\n'");
+    printf("Bienvenido al juego 'MarsDHL\n'");
     printf("En el juego transportaras plantas a marte enfrentandote a todo tipo de cosas\n");
     printf("\t**DISFRUTA EL JUEGO**\n");
     do {
@@ -36,7 +36,7 @@ int main() {
         switch (opcion) {
             case 1:
                 printf("/-----------------------------------------------/\n");
-                printf("/**NIVEL 1:**\n");
+                printf("/**NIVEL 1:**/\n");
                 printf("/-----------------------------------------------/\n");
                 peligros = rand() % 3 + 3; /*De 2 a 5 planetas*/
                 printf("Se generaron %d planetas, de los cuales algunos son muy peligros\n", peligros);

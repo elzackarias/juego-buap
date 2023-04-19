@@ -58,8 +58,8 @@ int main() {
                 printf("Se generaron %d planetas, de los cuales algunos son muy peligros\n", peligrosGen);
                 sleep(3);
                 for (cont = 0; cont < peligrosGen; cont++) {
-                    peligro.vel = 5000;                                        // Velocidad desde 300 a 5000 km/h (Pendiente)
-                    peligro.dist = 5000;                                       // Genera una distancia entre 1 y 1500 km (Pendiente)
+                    peligro.dist = rand()%401 + 50; //Distancia 50 a 450
+                    peligro.vel = rand()%1401 + 100; //Velocidad 100 a 1500
                     aleat1 = rand() % 2;                                        // Genera un planeta vivo o muerto
                     printf("**********************************************************************************\n");
                     printf("*                               BITACORA DEL VIAJE                               *\n");
@@ -87,7 +87,7 @@ int main() {
                         fflush(stdout);  // Con esta funcion hacemos que los caracteres se impriman inmediatamente
                         sleep(1);
                     }putchar('\n');
-                    if (peligro.dist >= 200 && peligro.vel > 200)  // Condiciones
+                    if (peligro.dist >= 200 && peligro.vel > 200)  // Condiciones planetas
                         control = 1;
                     else if ((peligro.dist > 400 && peligro.dist < 800) && (peligro.vel < 1000) && aleat1 == 0)
                         control = 2;
@@ -211,8 +211,6 @@ int main() {
                 printf("Se generaron %d meteoros, de los cuales algunos son muy grandes...\n", peligrosGen);
                 sleep(3);
                 for (cont = 0; cont <  peligrosGen; cont++) { //Recorrido de Meteoros
-                    peligro.vel = rand() % 4701 + 300;                         // Velocidad desde 300 a 5000 km/h (Pendiente)
-                    peligro.dist = rand() % 1500 + 1;                          // Genera una distancia entre 1 y 1500 km (Pendiente)
                     peligro.dist = rand()%801 +150//distancia de 150 a 950
                     peligro.vel = rand()%2501 + 1000//velocidad de 1000 a 3500
                     printf("**********************************************************************************\n");
@@ -364,8 +362,8 @@ int main() {
                 printf("Cruzaras %d Hoyos Negros en este nivel, ten mucho cuidado!\n", peligrosGen);
                 sleep(3);
                 for (cont = 1; cont <= peligrosGen; cont++) {
-                    peligro.vel = rand() % 4701 + 300;                         // Velocidad desde 300 a 5000 km/h (Pendiente)
-                    peligro.dist = rand() % 1500 + 1;                          // Genera una distancia entre 1 y 1500 km (Pendiente)
+                    peligro.dist = rand()%1351 + 250; //Distancia de 250 a 1600
+                    peligro.vel = rand()%4001 + 1500; //Velocidad de 1500 a 5500
                     printf("**********************************************************************************\n");
                     printf("*                               BITACORA DEL VIAJE                               *\n");
                     printf("**********************************************************************************\n");

@@ -23,7 +23,7 @@ int main() {
     srand(time(NULL));
     do {
         if (sigNivel == 1) {
-            printf("Selecciona una de las siguientes opciones:\n");
+            printf("\033[0;37mSelecciona una de las siguientes opciones:\n");
             for (i = 1; i < 4; i++)
                 printf("%d - Nivel %d\n", i, i);
             printf("4 - Salir\n");
@@ -58,8 +58,8 @@ int main() {
                 printf("Se generaron %d planetas, de los cuales algunos son muy peligros\n", peligrosGen);
                 sleep(3);
                 for (cont = 0; cont < peligrosGen; cont++) {
-                    peligro.dist = rand()%401 + 50; //Distancia 50 a 450
-                    peligro.vel = rand()%1401 + 100; //Velocidad 100 a 1500
+                    peligro.dist = rand()%311 + 200; //Distancia 200 a 510
+                    peligro.vel = rand()%1301 + 200; //Velocidad 200 a 1500
                     aleat1 = rand() % 2;                                        // Genera un planeta vivo o muerto
                     printf("**********************************************************************************\n");
                     printf("*                               BITACORA DEL VIAJE                               *\n");
@@ -87,21 +87,22 @@ int main() {
                         fflush(stdout);  // Con esta funcion hacemos que los caracteres se impriman inmediatamente
                         sleep(1);
                     }putchar('\n');
-                    if (peligro.dist >= 200 && peligro.vel > 200)  // Condiciones planetas
-                        control = 1;
-                    else if ((peligro.dist > 400 && peligro.dist < 800) && (peligro.vel < 1000) && aleat1 == 0)
+                    
+                    if ((peligro.dist > 400 && peligro.dist < 800) && (peligro.vel < 1000) && aleat1 == 0)  // Condiciones planetas
                         control = 2;
+                    else if (peligro.dist >= 200 && peligro.vel > 200)
+                        control = 1;
                     else if ((peligro.dist > 100 && peligro.dist < 200) && (peligro.vel > 1000))
                         control = 3;
                     else
                         control = 4;
                     switch (control) {  // Switch que determina el siguiente paso del juego
                         case 1:
-                            printf("Estas tan lejos del planeta que no es necesario esquivarlo o destruirlo, sigues tu ruta sin problemas :)\n=>");
+                            printf("Estas tan lejos del planeta que no es necesario esquivarlo o destruirlo, sigues tu ruta sin problemas : \n=>\n");
                             break;
                         case 2:
                             printf("Puedes destruir el planeta, si es asi perderas 40 capsulas por bala\n");
-                            printf("Escribe 1 para destruir o 0 para esquivar el planeta:\n=>");
+                            printf("Escribe 1 para destruir o 0 para esquivar el planeta:\n=>\n");
                             do {  // Validamos la respuesta del usuario
                                 scanf("%s", resp);
                                 opcion = 2;                                  // Asignamos a opcion el numero 2 para que se acabe el ciclo do while
@@ -115,17 +116,17 @@ int main() {
                                     printf("Las balas que utilizaste fueron %d, por lo tanto te quedan %d balas\n", aleat1, puntaje[opcion - 1].balas);
                                     printf("Perdiste %d vidas, te quedan %d vidas\n=>", vidaP, puntaje[opcion - 1].vidas);
                                 } else if (strcmp(resp, "1") == 0 && puntaje[opcion - 1].balas < 8)  // Si no tiene balas suficientes
-                                    printf("NO tienes balas suficientes, por lo tanto se esquiva el planeta en automatico\n=>");
+                                    printf("NO tienes balas suficientes, por lo tanto se esquiva el planeta en automatico\n=>\n");
                                 else if (strcmp(resp, "0") == 0)
-                                    printf("Decidiste esquivar el planeta\n=>");  // Respuesta negativa
+                                    printf("Decidiste esquivar el planeta\n=>\n");  // Respuesta negativa
                                 else {
-                                    printf("Escribe la opcion correcta\n=>");  // Si el usuario escribio otro caracter
+                                    printf("Escribe la opcion correcta\n=>\n");  // Si el usuario escribio otro caracter
                                     opcion = 3;                                // Se asigna a opcion el valor de 3 para que no se salga del ciclo si escribio algo incorrecto
                                 }
                             } while (opcion == 3);
                             break;
                         case 3:
-                            printf("Por poco y no la cuentas! Has esquivado por los pelos al planeta\nProcura no estar en estas situaciones...\n=>");
+                            printf("Por poco y no la cuentas! Has esquivado por los pelos al planeta\nProcura no estar en estas situaciones...\n=>\n");
                             break;
                         case 4:
                             printf("Oh no! A pesar de tus esfuerzos no se puede esquivar el planeta, sera un impacto total...\n");
@@ -144,7 +145,7 @@ int main() {
                             printf("                             ____\n                     __,-~~/~    `---.\n                   _/_,---(      ,    )\n               __ /        <    /   )  \\___\n- ------===;;;'====------------------===;;;===----- -  -\n                  \\/  ~\"~\"~\"~\"~\"~\\~\"~)~\"/\n                  (_ (   \\  (     >    \\)\n                   \\_( _ <         >_>'\n                      ~ `-i' ::>|--\"\n                          I;|.|.|\n                         <|i::|i|`.\n                        (` ^'\" ' \")\n\x1b[31m");
                             printf("La nave ha chocado de lleno contra el planeta.\nHas perdido el juego debido a un terrible accidente...\n");
                             printf("************************  GRACIAS POR JUGAR  ************************\n");
-                            printf("Pulse cualquier tecla para regresar al menu principal.\n=>");
+                            printf("Pulse cualquier tecla para regresar al menu principal.\n=>\n");
                             free(puntaje);
                             sigNivel = 1;
                             cont = peligrosGen;  // Se le asigna el valor de generados para que se acabe el ciclo for
@@ -154,6 +155,7 @@ int main() {
                     getch();
                     putchar('\n');
                     if (perder != 1) {                                                                            // Se restringue esta parte de codigo para que solo se muestre en caso de que no se pierda
+                    peligro.vel= rand()%2501 + 1000;
                         if (rand() % 4 <= 2 && peligro.vel > 1500 && 3000 < peligro.vel) {                      // Se genera una distancia con el objeto y se evalua si se puede tomar el objeto
                             aleat1 = rand() % 3 + 1;                                                              // Se crea una cantidad de objetos aleatorios entre 1 y 3
                             printf("Te haz encontrado con una cantidad de %d '%s' \n", aleat1, obj[rand() % 7]);  // Se encuentra con varios objetos del mismo tipo
@@ -171,7 +173,7 @@ int main() {
                                 printf("Haz destruido los objetos.\n");
                         } else
                             printf("Encontraste un objeto pero desgraciadamente estabas muy lejos de el...\n");
-                        printf("Ademas, ya que superaste un planeta en tu recorido obtienes 2 '%s'! \n=>", obj[rand() % 7]);
+                        printf("Ademas, ya que superaste un planeta en tu recorido obtienes 2 '%s'!\n=>\n", obj[rand() % 7]);
                         puntaje[opcion - 1].objetosCap += 2;
                         getch();
                         putchar('\n');
@@ -211,8 +213,8 @@ int main() {
                 printf("Se generaron %d meteoros, de los cuales algunos son muy grandes...\n", peligrosGen);
                 sleep(3);
                 for (cont = 0; cont <  peligrosGen; cont++) { //Recorrido de Meteoros
-                    peligro.dist = rand()%801 +150//distancia de 150 a 950
-                    peligro.vel = rand()%2501 + 1000//velocidad de 1000 a 3500
+                    peligro.dist = rand()%801 +150; //distancia de 150 a 950
+                    peligro.vel = rand()%2501 + 1000;//velocidad de 1000 a 3500
                     printf("**********************************************************************************\n");
                     printf("*                               BITACORA DEL VIAJE                               *\n");
                     printf("**********************************************************************************\n");

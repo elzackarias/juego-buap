@@ -1,548 +1,532 @@
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-// #include <conio.h>
-#include <unistd.h>  //Sirve para el sleep()
+#include <unistd.h>
+#define getch() system("read -n1 -p ' ' key")
+// #include<conio.h>
+struct datos {
+    int dist;
+    int vel;
+};
+struct bitacora {
+    int destruidos, vidas, balas, objetosCap;
+};
 int main() {
-    srand(time(NULL));  // se utiliza para que se produzca una secuencia de números aleatorios diferente
-    int vida = 10000, vidap = 0, dist = 0, disO, aleat1, aleat2, opcion = 0, cont, balas = 10000, ans = 2, signivel = 1, peligros, contast, i, disN3[20], hoyos, contho, opc, conts[3] = {0};
-    float vel, dis, velN3[20];
-    char cad[3], cad1[3], cad2[3];
-
-    // letrero inicio
-    printf(" ______                  _____   _     _ _       \n|  ___ \\                (____ \\ | |   | | |      \n| | _ | | ____  ____ ___ _   \\ \\| |__ | | |      \n| || || |/ _  |/ ___)___) |   | |  __)| | |      \n| || || ( ( | | |  |___ | |__/ /| |   | | |_____ \n|_||_||_|\\_||_|_|  (___/|_____/ |_|   |_|_______)\n");
-    printf("Bienvenido al juego 'MarsDHL\n'");
-    printf("En el juego transportaras plantas a marte enfrentandote a todo tipo de cosas\n");
-    printf("\t**DISFRUTA EL JUEGO**\n");
+    const char *obj[] = {"Satelite", "Propulsor obsoleto", "Parte de nave abandonada", "Traje Espacial", "Objeto raro", "Jet Propulsor", "Armamento oxidado"};
+    int cont, i, aleat1, peligrosGen, band1 = 0, band2 = 0, vidaP = 0, opcion = 0, control = 0, perder = 0, sigNivel = 1;
+    struct datos peligro;
+    struct bitacora *puntaje = NULL; //Inicializamos en NULL
+    float aleat2;
+    char resp[2];
+    srand(time(NULL));
     do {
-        // MENU
-        // Solo se muestra el menu en caso que la opcion y signivel se mantengan con los valores iniciales
-        if (opcion == 0 && signivel == 1) {
-            printf("Selecciona una de las siguientes opciones\n");
-            printf("1 - Nivel 1\n");
-            printf("2 - Nivel 2\n");
-            printf("3 - Nivel 3\n");
+        if (sigNivel == 1) {
+            printf("Selecciona una de las siguientes opciones:\n");
+            for (i = 1; i < 4; i++)
+                printf("%d - Nivel %d\n", i, i);
             printf("4 - Salir\n");
-            // Se comprueba si se ingresó solo un numero, de lo contrario manda error
-            if (scanf("%d", &opcion) != 1) {
-                fprintf(stderr, "Solo se permiten numeros del 1 al 4\n");
-                exit(1);
+            do {                                 // Se valida la respuesta del usuario
+                scanf("%s", resp);              // Leemos como caracter
+                opcion = atoi(resp);             // Asignamos a opcion el numero ASCII al caracter que escribio el usuario o damos el numero (en entero) que el usuario dio
+                if (opcion >= 1 && opcion <= 4)  // Damos un rango de opciones validas
+                    band1 = 1;                   // Asignamos a la bandera 1 para salir
+                else {
+                    printf("Selecciona un numero del 1 al 4:\n");
+                    band1 = 0;  // Asignamos a la bandera 0 para seguir en el ciclo
+                }
+            } while (band1 == 0);
+        } else
+            opcion = sigNivel;
+        if (sigNivel == 1) {
+            if (opcion != 4) {
+                puntaje = (struct bitacora *)calloc(opcion, sizeof(struct bitacora));
+                puntaje[opcion - 1].vidas = 10000;
+                puntaje[opcion - 1].balas = 10000;
             }
-        } else {
-            // Al ganar un nivel, se incrementa en 1 a signivel, y se le asigna a opcion para ir directamente al sig. nivel sin el menu
-            opcion = signivel;
         }
+        vidaP = band1 = band2 = aleat1 = control = perder = 0;  // Cada que terminemos un nivel, se reinician todas las variables que se necesitan en el proceso
         switch (opcion) {
-            case 1:
+            case 1:  // Nivel 1
+                printf("Iniciando nivel 1...\n");
+                sleep(3);
                 printf("/-----------------------------------------------/\n");
-                printf("/**NIVEL 1:**/\n");
+                printf("/**NIVEL 1:**\n");  // Nivel 1
                 printf("/-----------------------------------------------/\n");
-                peligros = rand() % 3 + 3; /*De 2 a 5 planetas*/
-                printf("Se generaron %d planetas, de los cuales algunos son muy peligros\n", peligros);
-                sleep(2);
-                vel = rand() % 950 + 600; /*De 900 a 1550 km/h de velocidad*/
-                // Planetas
-                for (cont = 0; cont < peligros; cont++) { /*Para que el jugador pueda ganar, se deben de cruzar cada uno de lo()s obstaculos*/
-                    dist = rand() % 150 + 90;             /*Distancia de 150 a 240 km*/
-                    vel -= 10;
-                    printf("Encontraste un planeta\n");
-                    sleep(3);
-                    printf("/-----------------------------------------------/\n");
-                    printf("/**Tu velocidad actual: %1.0f km/h**\n", vel);
-                    printf("/-----------------------------------------------/\n");
-                    printf("Distancia con el planeta: %d kilometros\n", dist);
-                    printf("/-----------------------------------------------/\n");
-                    printf("/**Revisando si tiene vida o no**\n");
-                    printf("/-----------------------------------------------/\n");
-                    sleep(5);
-                    if (dist > 200) {  // Si la distancia es mayor que 200 km, no nos importa si el planeta esta vivo o muerto, ya que aun asi lo pasara en ambos casos
-                        printf("Estas tan lejos del planeta que no es necesario esquivarlo o destruirlo. Sigues tu ruta sin problemas\n");
-                        sleep(3);
-                    } else {
-                        aleat1 = rand() % 2;  //*Generando planeta vivo o muerto
-                        if (aleat1 == 0) {    // Planeta muerto
-                            printf("Te haz encontrado con un planeta muerto\n");
-                            sleep(3);
-                            printf("/-----------------------------------------------/\n");
-                            printf("**Revisando si puede destruir el planeta...**\n");
-                            printf("/-----------------------------------------------/\n");
-                            sleep(3);
-                            if (((dist > 100) && (dist < 200)) && (vel <= 1000)) {  // Si la condicion se cumple se podra destruir el planeta
-                                printf("Puedes destruir el planeta si es que lo desea\n");
-                                sleep(3);
-                                printf("Desea destruir el planeta? Si es asi perdera 30 capsulas por cada bala.\n");
-                                sleep(3);
-                                printf("Escriba SI para destruir el planeta o NO para esquivarlo:\n");
-                                sleep(2);
-                                do {  // Validacion de la respuesta del usuario
-                                    scanf("%s", cad);
-                                    cad1[0] = 'S';
-                                    cad1[1] = 'I';
-                                    cad1[2] = '\0';
-                                    // strcmp -> Compara la cadena ingresada (cad) con la cadena esperada (cad1), le sumamos 1 y los seteamos como el valor
-                                    //  de opcion, si nos da 1 significa que las cadenas coinciden, de lo contrario esto es falso
-                                    opcion = 1 + strcmp(cad, cad1);
-                                    if (opcion == 1) {
-                                        if (balas >= 2) {
-                                            aleat1 = rand() % 2 + 8;  // 2 a 8 balas
-                                            // Por c/bala disparada pierdes 30 caps. vida
-                                            vidap = aleat1 * 30;
-                                            vida = vida - vidap;
-                                            balas = balas - aleat1;
-                                            conts[0]++;  // conts[0] es la flag de planetas destruidos
-                                            printf("Haz destruido el planeta con exito\n");
-                                            sleep(3);
-                                            printf("Las balas que utilizaste fueron %d, por lo tanto te quedan %d balas\n", aleat1, balas);
-                                            sleep(3);
-                                            printf("Perdiste %d vidas, te quedan %d vidas\n", vidap, vida);
-                                        } else {
-                                            printf("NO tienes balas suficientes\n");
-                                        }
-                                    } else {
-                                        // Si la sentecia anterior es falsa, entonces, ahora comparamos la cadena ingresada con la cad2,
-                                        //  le sumamos 2 y si estas coinciden, nos retornara un 2, de lo contrario nos generara un 3
-                                        cad2[0] = 'N';
-                                        cad2[1] = 'O';
-                                        cad2[2] = '\0';
-                                        opcion = 2 + strcmp(cad, cad2);
-                                        if (opcion == 2)
-                                            printf("Decidiste esquivar el planeta\n");
-                                        else {
-                                            printf("Escribe la opcion correcta\n");
-                                            opcion = 3;
-                                        }
-                                    }
-                                } while (opcion == 3);
-                            } else {  // Si el planeta muerto no puede ser destruido entonces se pasa a esquivarlo
-                                printf("No puedes destruir el planeta, tienes que esquivarlo lo mas rapido posible\n");
-                                printf("Se necesita una velocidad mayor a 1000 km/h para esquivar\n");
-                                sleep(5);
-                                printf("------------------------------------------------------------/ \n");
-                                printf("La nave esta haciendo lo posible para esquivar el planeta... \n");
-                                printf("------------------------------------------------------------/ \n");
-                                sleep(5);
-                                if (((dist > 100) && (dist < 200)) && (vel > 1000)) {  // Si la condicion se cumple se esquiva el planeta
-                                    printf("Por poco y no la cuentas! Has esquivado por los pelos al planeta\n");
-                                    sleep(3);
-                                    printf("Procura no estar en estas situaciones...\n");
-                                    sleep(3);
-                                } else {  // Si no se puede esquivar el planeta entonces el jugador choca y el juego termina
-                                    printf("Oh no! A pesar de tus esfuerzos no se puede esquivar el planeta, sera un impacto total...\n");
-                                    sleep(1);
-                                    printf("Impactaras con el planeta en:\n");
-                                    printf("3\n");
-                                    sleep(1);
-                                    printf("2\n");
-                                    sleep(1);
-                                    printf("1\n");
-                                    sleep(1);
-                                    printf("...\n");
-                                    sleep(5);
-                                    // Grafico de bomba
-                                    printf("                             ____\n                     __,-~~/~    `---.\n                   _/_,---(      ,    )\n               __ /        <    /   )  \\___\n- ------===;;;'====------------------===;;;===----- -  -\n                  \\/  ~\"~\"~\"~\"~\"~\\~\"~)~\"/\n                  (_ (   \\  (     >    \\)\n                   \\_( _ <         >_>'\n                      ~ `-i' ::>|--\"\n                          I;|.|.|\n                         <|i::|i|`.\n                        (` ^'\" ' \")\n\x1b[31m");
-                                    printf("La nave ha chocado de lleno contra el planeta.\n");
-                                    sleep(3);
-                                    printf("Has perdido el juego debido a un terrible accidente...\n");
-                                    sleep(2);
-                                    printf("/-----------------------------------------------/\n");
-                                    printf("\t**GRACIAS POR JUGAR**\n");
-                                    printf("/-----------------------------------------------/\n");
-                                    return 0;
-                                }
-                            }
-                        } else {  // Planeta con vida
-                            printf("Te has encontrado con un planeta con vida\n");
-                            printf("No puedes destruir el planeta ya que tiene vida\n");
-                            printf("Tienes que esquivar este planeta lo mas rapido posible, se necesita una velocidad mayor a 1000 km/h para esquivar\n");
-                            sleep(6);
-                            printf("/-----------------------------------------------/\n");
-                            printf("/**Haciendo lo posible para esquivar el planeta...**\n");
-                            printf("/-----------------------------------------------/\n");
-                            sleep(5);
-                            if (((dist > 100) && (dist < 200)) && (vel > 1000)) {  // Si la condicion se cumple se esquiva el planeta
-                                printf("Por poco y no la cuentas! Has esquivado por los pelos al planeta\n");
-                                sleep(3);
-                                printf("Procura no estar en estas situaciones...\n");
-                                sleep(3);
-                            } else {  // Si no se puede esquivar el planeta entonces el jugador choca y el juego termina
-                                printf("Oh no! A pesar de tus esfuerzos no se puede esquivar el planeta, sera un impacto total...\n");
-                                sleep(1);
-                                printf("Impactaras con el planeta en:\n");
-                                printf("3\n");
-                                sleep(1);
-                                printf("2\n");
-                                sleep(1);
-                                printf("1\n");
-                                sleep(1);
-                                printf("...\n");
-                                sleep(4);
-                                // Grafico de bomba
-                                printf("                             ____\n                     __,-~~/~    `---.\n                   _/_,---(      ,    )\n               __ /        <    /   )  \\___\n- ------===;;;'====------------------===;;;===----- -  -\n                  \\/  ~\"~\"~\"~\"~\"~\\~\"~)~\"/\n                  (_ (   \\  (     >    \\)\n                   \\_( _ <         >_>'\n                      ~ `-i' ::>|--\"\n                          I;|.|.|\n                         <|i::|i|`.\n                        (` ^'\" ' \")\n");
-                                printf("La nave ha chocado de lleno contra el planeta.\n");
-                                printf("Has perdido el juego debido a un terrible accidente...\n");
-                                sleep(3);
-                                printf("/-----------------------------------------------/\n");
-                                printf("**GRACIAS POR JUGAR**\n");
-                                printf("/-----------------------------------------------/\n");
-                                return 0;
-                            }
-                        }
-                    }
-                    // Objetos
-                    aleat1 = rand() % 6; /*Generando numero aleatorio de 0 a 5*/
-                    if (aleat1 <= 2) {   // El jugador podra encontrarse con el objeto si solo si el numero aleatorio generado este entre 0 y 2
-                        printf("Encontraste un objeto en tu recorrido\n");
-                        sleep(3);
-                        aleat2 = rand() % 2000 + 1000;  // Generando distancia de la nave al objeto de 1000m a 3000m
-                        if (aleat2 <= 2000) {           // El jugador podra tomar el objeto si su distancia con el objeto es menor o igual a 2000
-                            printf("No sabras que es el objeto hasta que lo tomes\n");
-                            printf("Desea tomar el objeto? Si es asi, perderas 50 capsulas de vida. Escriba SI o NO):\n");
-                            sleep(4);
-                            do {
-                                scanf("%s", cad);
-                                cad1[0] = 'S';
-                                cad1[1] = 'I';
-                                cad1[2] = '\0';
-                                opcion = 1 + strcmp(cad, cad1);
-                                if (opcion == 1) {
-                                    printf("Decidiste tomar el objeto\n");
-                                    sleep(3);
-                                    if (aleat1 == 0) {              // Objeto 1: Propulsor
-                                        aleat2 = rand() % 50 + 100; /*Velocidad ganada de 50 a 150 km/h*/
-                                        vel = vel + aleat2;
-                                        printf("Tomaste un propulsor de %d km/h, ahora tienes mas velocidad\n", aleat2);
-                                    } else if (aleat1 == 1) {      // Objeto 2: Vidas
-                                        aleat2 = rand() % 31 + 50; /*De 30 a 80 capsulas de vida*/
-                                        printf("Tomaste %d capsulas de vida, ahora tienes mas vida\n", aleat2);
-                                    } else {                       // Objeto 3: Balas
-                                        aleat2 = rand() % 41 + 20; /*De 40 a 60 balas*/
-                                        printf("Tomaste %d balas, ahora tienes mas balas\n", aleat2);
-                                    }
-                                    vida -= 50;
-                                    printf("Perdiste 50 capsulas de vida por agarrar el objeto\n");
-                                } else {
-                                    cad2[0] = 'N';
-                                    cad2[1] = 'O';
-                                    cad2[2] = '\0';
-                                    opcion = 2 + strcmp(cad, cad2);
-                                    if (opcion == 2) {
-                                        printf("Decidiste no tomar el objeto\n");
-                                    } else {
-                                        printf("Escribe la opcion correcta\n");
-                                        opcion = 3;
-                                    }
+                peligrosGen = rand() % 3 + 4;  // Generando de 4 a 6 planetas
+                printf("Se generaron %d planetas, de los cuales algunos son muy peligros\n", peligrosGen);
+                sleep(3);
+                for (cont = 0; cont < peligrosGen; cont++) {
+                    peligro.vel = 5000;                                        // Velocidad desde 300 a 5000 km/h (Pendiente)
+                    peligro.dist = 5000;                                       // Genera una distancia entre 1 y 1500 km (Pendiente)
+                    aleat1 = rand() % 2;                                        // Genera un planeta vivo o muerto
+                    printf("**********************************************************************************\n");
+                    printf("*                               BITACORA DEL VIAJE                               *\n");
+                    printf("**********************************************************************************\n");
+                    printf("| Planetas avistados: %5d planetas                                             |\n", cont);
+                    printf("| Planetas destruidos: %5d                                                     |\n", puntaje[opcion - 1].destruidos);
+                    printf("| Capsulas de la nave: %5d capsulas                                            |\n", puntaje[opcion - 1].vidas);
+                    printf("| Balas restantes: %5d balas                                                   |\n", puntaje[opcion - 1].balas);
+                    printf("| Objetos capturados: %5d objetos                                              |\n", puntaje[opcion - 1].objetosCap);
+                    printf("**********************************************************************************\n=>\n");
+                    getch();
+                    putchar('\n');
+                    printf("**********************************************************************************\n");
+                    printf("*                             ENCONTRASTE UN PLANETA                             *\n");
+                    printf("**********************************************************************************\n");
+                    printf("| Velocidad actual: %5.0d km/h                                                   |\n", peligro.vel);
+                    printf("| Distancia con el planeta: %5.0d kilometros                                     |\n", peligro.dist);
+                    printf("**********************************************************************************\n=>\n");
+                    getch();                                                                               // Se espera a que el usuario presione cualquier tecla y se sigue con el juego
+                    putchar('\n');                                                                         // Despues de que el usuario haya presionado la tecla, se da un salto de linea para que se escriba correctamente el prog.
+                    printf("%s", aleat1 == 0 ? "El planeta no tiene vida\n" : "El planeta tiene vida\n");  // Operador terciario en funcion printf
+                    printf("************************  Analizando las condiciones con el planeta...  ************************\n");
+                    for (i = 0; i < 3; i++) { //Animacion
+                        printf(".");
+                        fflush(stdout);  // Con esta funcion hacemos que los caracteres se impriman inmediatamente
+                        sleep(1);
+                    }putchar('\n');
+                    if (peligro.dist >= 200 && peligro.vel > 200)  // Condiciones
+                        control = 1;
+                    else if ((peligro.dist > 400 && peligro.dist < 800) && (peligro.vel < 1000) && aleat1 == 0)
+                        control = 2;
+                    else if ((peligro.dist > 100 && peligro.dist < 200) && (peligro.vel > 1000))
+                        control = 3;
+                    else
+                        control = 4;
+                    switch (control) {  // Switch que determina el siguiente paso del juego
+                        case 1:
+                            printf("Estas tan lejos del planeta que no es necesario esquivarlo o destruirlo, sigues tu ruta sin problemas :)\n=>");
+                            break;
+                        case 2:
+                            printf("Puedes destruir el planeta, si es asi perderas 40 capsulas por bala\n");
+                            printf("Escribe 1 para destruir o 0 para esquivar el planeta:\n=>");
+                            do {  // Validamos la respuesta del usuario
+                                scanf("%s", resp);
+                                opcion = 2;                                  // Asignamos a opcion el numero 2 para que se acabe el ciclo do while
+                                if (strcmp(resp, "1") == 0 && puntaje[opcion - 1].balas >= 8) {  // Respuesta afirmativa
+                                    aleat1 = rand() % 2 + 8;                 // Generando 2 a 8 balas
+                                    vidaP = aleat1 * 30;                     // Se pierde 30 de vida por cada bala
+                                    puntaje[opcion - 1].vidas -= vidaP;      // Se le resta la vida perdida
+                                    puntaje[opcion - 1].balas -= aleat1;     // Se le restan las balas perdidas
+                                    puntaje[opcion - 1].destruidos += 1;     // Contador de destrucciones
+                                    printf("Haz destruido el planeta con exito\n");
+                                    printf("Las balas que utilizaste fueron %d, por lo tanto te quedan %d balas\n", aleat1, puntaje[opcion - 1].balas);
+                                    printf("Perdiste %d vidas, te quedan %d vidas\n=>", vidaP, puntaje[opcion - 1].vidas);
+                                } else if (strcmp(resp, "1") == 0 && puntaje[opcion - 1].balas < 8)  // Si no tiene balas suficientes
+                                    printf("NO tienes balas suficientes, por lo tanto se esquiva el planeta en automatico\n=>");
+                                else if (strcmp(resp, "0") == 0)
+                                    printf("Decidiste esquivar el planeta\n=>");  // Respuesta negativa
+                                else {
+                                    printf("Escribe la opcion correcta\n=>");  // Si el usuario escribio otro caracter
+                                    opcion = 3;                                // Se asigna a opcion el valor de 3 para que no se salga del ciclo si escribio algo incorrecto
                                 }
                             } while (opcion == 3);
-                        } else {
-                            printf("Desgraciadamente estas muy lejos del objeto (%d m) para poder tomarlo...\n",aleat2);
-                        }
-                    } else {
-                        printf("En tu recorrido no haz encontrado ningun objeto\n");
-                    }
-                    sleep(5);
-                }
-                /*Resultado del juego*/
-                if (conts[0] <= 2)  // conts[0] -> Planetas destruidos
-                    conts[0] = 1;
-                if (balas >= 7000)  // conts[1] -> Total de balas
-                    conts[1]++;
-                if (vida >= 1000)  // conts[2] -> Total de vidas
-                    conts[2]++;
-                if ((conts[0] + conts[1] + conts[2]) == 3) {  // Si estas son igual a 3 puedes seguir
-                    printf("Felicidades, Has pasado el nivel con exito! Puedes seguir al siguiente nivel\n");
-                    signivel++;
-                    opcion = 0;
-                } else
-                    printf("Oh no... No pudiste ganar debido a que te faltaron puntos... Intentalo de nuevo!\n");
-                sleep(2);
-            case 2:
-                printf("\n\n/-----------------------------------/\n");
-                printf("/**NIVEL 2:**\n");
-                printf("/-----------------------------------/\n");
-                if (signivel != 1) {
-                    printf("Ya que has ganado el nivel 1 se mantendra tu vida y tus balas\n");
-                } else {
-                    signivel = 2;
-                }
-                peligros = rand() % 4 + 6;  // Se generan meteoreos del rango de 6 a 9
-                contast = 0;                // Contador de asteroides
-                printf("Se generaron %d meteoros \n", peligros);
-                sleep(2);
-                for (cont = 0; cont < peligros; cont++) {
-                    dist = (rand() % 216) + 185;  // distancia entre 185 y 400
-                    vel = rand() % 1001 + 1500;   // velocidad 1500 a 2500
-                    sleep(2);
-                    printf("\n******************\n* Aparecio el meteoro %d *\n******************\n", cont + 1);
-                    sleep(2);
-                    printf(" \n ------ Velocidad %1.0f km/h ------\n", vel);
-                    sleep(2);
-                    printf("\n --- Distancia %d km --- \n", dist);
-                    if (dist >= 350) {
-                        contast += 10;
-                        printf("Has esquivado el meteoro,\n Ganaste 10 asteroides destruidos\n");
-                        sleep(3);
-                    } else {
-                        if (dist > 200 && dist < 350) {
-                            if (vel > 2000) {
-                                printf("Has evadido el meteoro :), \nGanaste 15 asteroides destruidos\n");
-                                contast += 15;
-                            } else {
-                                printf("\nPuedes destruir el meteoro \n");
-                                printf("Escriba 'SI' para destruir o 'NO' para evadirlo \n");
-                                do {
-                                    scanf("%s", cad);
-                                    cad1[0] = 'S';
-                                    cad1[1] = 'I';
-                                    cad1[2] = '\0';
-                                    opcion = 1 + strcmp(cad, cad1);
-                                    if (opcion == 1) {
-                                        if (balas >= 6 && vida >= 80) {
-                                            aleat1 = rand() % 2 + 8;
-                                            balas -= aleat1 * 3;  // aleat1 genera disparos y c/disparo contiene 3 balas
-                                            vidap = aleat1 * 40;
-                                            vida -= vidap;
-                                            contast += 20;
-                                            sleep(2);
-                                            printf("Destruiste el meteoro con sus asteroides\n");
-                                            printf("Realizaste %d disparos\n",aleat1);
-                                            printf("Perdiste:\n %d Balas \n %d Vidas \n", aleat1 * 3, vidap);
-                                            printf("Te Quedan: \n %d Vidas \n %d Balas\n", vida, balas);
-                                            sleep(2);
-                                        } else {
-                                            printf("No lo puedes destruir, insuficiencia de balas o vidas\n");
-                                        }
-                                    } else {
-                                        cad2[0] = 'N';
-                                        cad2[1] = 'O';
-                                        cad2[2] = '\0';
-                                        opcion = 2 + strcmp(cad, cad2);
-                                        if (opcion == 2) {
-                                            printf("Decidiste no destruirlo. Continua el viaje :)\n");
-                                        } else {
-                                            printf("Escribe la opcion correcta\n");
-                                            opcion = 3;
-                                        }
-                                    }
-                                } while (opcion == 3);
+                            break;
+                        case 3:
+                            printf("Por poco y no la cuentas! Has esquivado por los pelos al planeta\nProcura no estar en estas situaciones...\n=>");
+                            break;
+                        case 4:
+                            printf("Oh no! A pesar de tus esfuerzos no se puede esquivar el planeta, sera un impacto total...\n");
+                            sleep(1);
+                            printf("Impactaras con el planeta en:\n");
+                            for (i = 3; i > 0; i--) {  // Se hace un conteo regresivo de 3 hasta el 1, esperando un segundo entre cada numero
+                                printf("%d\n", i);
+                                sleep(1);
                             }
-                        } else {
-                            sleep(2);
-                            printf("\n No pudiste esquivar el meteoro, distancia insuficiente \nImpactaras en: \n");
-                            printf("3\n");
-                            sleep(1);
-                            printf("2\n");
-                            sleep(1);
-                            printf("1\n");
-                            sleep(1);
-                            printf("...\n");
-                            sleep(4);
+                            for (i = 0; i < 3; i++) { //Animacion espera
+                                printf(".");
+                                fflush(stdout);  // Con esta funcion hacemos que los caracteres se impriman inmediatamente
+                                sleep(1);
+                            }putchar('\n');
                             // Grafico de bomba
-                            printf("                             ____\n                     __,-~~/~    `---.\n                   _/_,---(      ,    )\n               __ /        <    /   )  \\___\n- ------===;;;'====------------------===;;;===----- -  -\n                  \\/  ~\"~\"~\"~\"~\"~\\~\"~)~\"/\n                  (_ (   \\  (     >    \\)\n                   \\_( _ <         >_>'\n                      ~ `-i' ::>|--\"\n                          I;|.|.|\n                         <|i::|i|`.\n                        (` ^'\" ' \")\n");
-                            printf("Has perdido el juego :c\n");
-                            return 0;
-                        }
+                            printf("                             ____\n                     __,-~~/~    `---.\n                   _/_,---(      ,    )\n               __ /        <    /   )  \\___\n- ------===;;;'====------------------===;;;===----- -  -\n                  \\/  ~\"~\"~\"~\"~\"~\\~\"~)~\"/\n                  (_ (   \\  (     >    \\)\n                   \\_( _ <         >_>'\n                      ~ `-i' ::>|--\"\n                          I;|.|.|\n                         <|i::|i|`.\n                        (` ^'\" ' \")\n\x1b[31m");
+                            printf("La nave ha chocado de lleno contra el planeta.\nHas perdido el juego debido a un terrible accidente...\n");
+                            printf("************************  GRACIAS POR JUGAR  ************************\n");
+                            printf("Pulse cualquier tecla para regresar al menu principal.\n=>");
+                            free(puntaje);
+                            sigNivel = 1;
+                            cont = peligrosGen;  // Se le asigna el valor de generados para que se acabe el ciclo for
+                            perder = 1;          // Se usa una bandera para omitir la parte de la busqueda de objetos y el puntaje final
+                            break;
                     }
-                    if ((cont % 4) == 0) {  // Se generan los objetos solo cuando el meteoro (cont) es multiplo de 4
+                    getch();
+                    putchar('\n');
+                    if (perder != 1) {                                                                            // Se restringue esta parte de codigo para que solo se muestre en caso de que no se pierda
+                        if (rand() % 4 <= 2 && peligro.vel > 1500 && 3000 < peligro.vel) {                      // Se genera una distancia con el objeto y se evalua si se puede tomar el objeto
+                            aleat1 = rand() % 3 + 1;                                                              // Se crea una cantidad de objetos aleatorios entre 1 y 3
+                            printf("Te haz encontrado con una cantidad de %d '%s' \n", aleat1, obj[rand() % 7]);  // Se encuentra con varios objetos del mismo tipo
+                            for (i = 0; i < 3; i++) {
+                                printf(".");
+                                fflush(stdout);
+                                sleep(1);
+                            }putchar('\n');
+                            if (rand() % 2 == 0) {                         // Se da una probabilidad de 50/50 de tomar o destruir los objetos
+                                puntaje[opcion - 1].objetosCap += aleat1;  // Contador de cuantos objetos se han capturado
+                                vidaP = aleat1 * 20;                     // Cada que se toma un objeto se pierden 20 capsulas de vida
+                                puntaje[opcion - 1].vidas -= vidaP;
+                                printf("Te haz quedado con los objetos, a cambio de ello perdiste %d capsulas de vida.\nTe quedan %d capsulas\n", vidaP, puntaje[opcion - 1].vidas);
+                            } else
+                                printf("Haz destruido los objetos.\n");
+                        } else
+                            printf("Encontraste un objeto pero desgraciadamente estabas muy lejos de el...\n");
+                        printf("Ademas, ya que superaste un planeta en tu recorido obtienes 2 '%s'! \n=>", obj[rand() % 7]);
+                        puntaje[opcion - 1].objetosCap += 2;
+                        getch();
+                        putchar('\n');
+                    }system("clear");  // Limpiamos pantalla
+                }                     // Fin del recorrido de planetas
+                if (perder != 1) {    // Se restringue para que solo sea visible esta parte si el jugador no ha perdido
+                    printf("Haz sobrevivido a este nivel, veamos tus estadisticas:\n");
+                    printf("Vidas totales: %d \nBalas finales: %d \nPlanetas destruidos: %d \nObjetos capturados: %d\n=>", puntaje[opcion - 1].vidas, puntaje[opcion - 1].balas, puntaje[opcion - 1].destruidos, puntaje[opcion - 1].objetosCap);
+                    getch();
+                    putchar('\n');
+                    if ((puntaje[opcion - 1].balas >= 7000 && puntaje[opcion - 1].vidas >= 1000) && (puntaje[opcion - 1].destruidos <= 2 && puntaje[opcion - 1].objetosCap >= 10)) {
+                        printf("Felicidades, Has pasado el nivel con exito! Puedes seguir al siguiente nivel.\n=>");
+                        sigNivel++;  // Se pasa al siguiente nivel
+                    } else {
+                        printf("Oh no... No pudiste ganar debido a que te faltaron puntos... Intentalo de nuevo!\n=>");
+                        sigNivel = 1;
+                    }
+                    getch();
+                    putchar('\n');
+                }system("clear");  // Limpiamos pantalla
+                break;
+            case 2:  // Nivel 2
+                if (sigNivel == 2) {
+                    printf("Ya que has ganado el nivel 1 se mantendra tu vida y tus balas, buena suerte!\n");
+                    puntaje = (struct bitacora *)realloc(puntaje, 1 * sizeof(struct bitacora));
+                    puntaje[opcion - 1].objetosCap = 0;
+                    puntaje[opcion - 1].destruidos = 0;
+                    puntaje[opcion - 1].balas = puntaje[0].balas;
+                    puntaje[opcion - 1].vidas = puntaje[0].vidas;
+                }
+                printf("Iniciando nivel 2...\n");
+                sleep(3);
+                printf("/-----------------------------------------------/\n");
+                printf("/**NIVEL 2:**\n");  // Nivel 2
+                printf("/-----------------------------------------------/\n");
+                peligrosGen = rand() % 5 + 6;  // Generando de 6 a 10 meteoros
+                printf("Se generaron %d meteoros, de los cuales algunos son muy grandes...\n", peligrosGen);
+                sleep(3);
+                for (cont = 0; cont <  peligrosGen; cont++) { //Recorrido de Meteoros
+                    peligro.vel = rand() % 4701 + 300;                         // Velocidad desde 300 a 5000 km/h (Pendiente)
+                    peligro.dist = rand() % 1500 + 1;                          // Genera una distancia entre 1 y 1500 km (Pendiente)
+                    peligro.dist = rand()%801 +150//distancia de 150 a 950
+                    peligro.vel = rand()%2501 + 1000//velocidad de 1000 a 3500
+                    printf("**********************************************************************************\n");
+                    printf("*                               BITACORA DEL VIAJE                               *\n");
+                    printf("**********************************************************************************\n");
+                    printf("| Meteoros avistados: %5d meteoro                                              |\n", cont);
+                    printf("| Asteroides destruidos: %5d                                                   |\n", puntaje[opcion - 1].destruidos);
+                    printf("| Capsulas de la nave: %5d capsulas                                            |\n", puntaje[opcion - 1].vidas);
+                    printf("| Balas restantes: %5d balas                                                   |\n", puntaje[opcion - 1].balas);
+                    printf("| Objetos capturados: %5d objetos                                              |\n", puntaje[opcion - 1].objetosCap);
+                    printf("**********************************************************************************\n=>\n");
+                    getch();
+                    putchar('\n');
+                    printf("**********************************************************************************\n");
+                    printf("*                             ENCONTRASTE UN METEORO                             *\n");
+                    printf("**********************************************************************************\n");
+                    printf("| Velocidad actual: %5.0d km/h                                                   |\n", peligro.vel);
+                    printf("| Distancia con el planeta: %5.0d kilometros                                     |\n", peligro.dist);
+                    printf("**********************************************************************************\n=>\n");
+                    getch();
+                    putchar('\n');
+                    printf("************************  Analizando las condiciones con el meteoro...  ************************\n");
+                    for (i = 0; i < 3; i++) { //Animacion
+                        printf(".");
+                        fflush(stdout);  // Con esta funcion hacemos que los caracteres se impriman inmediatamente
                         sleep(1);
-                        printf("\n °°°°Aparecio un objeto de interes\n");
-                        dis = rand() % 3501;      // Se genera num. aleatorio entre 0 y 3.5km
-                        dis = (float)dis / 1000;  // como rand() no genera num decimales, primero generamos un num entre 0 y 3500 y lo dividimos entre 1000
-                        printf("Escriba 'SI' para tomarlo o 'NO' para esquivarlo \n");
-                        do {
-                            scanf("%s", cad);
-                            cad1[0] = 'S';
-                            cad1[1] = 'I';
-                            cad1[2] = '\0';
-                            opcion = 1 + strcmp(cad, cad1);
-                            if (opcion == 1) {
-                                if (dis >= 0 && dis <= 2.5) {  // Para tomar el objeto la distancia debe estar entre 0 y 2.5km
-                                    sleep(1);
-                                    printf("\nOuh!, tomaste el objeto de interes\nPerdiste: \n60 capsulas de vida\nGanaste: \n10 Balas \n 5 Asteroides destruidos\n");
-                                    vida -= 60;
-                                    balas += 10;
-                                    contast += 5;
-                                } else {
-                                    sleep(1);
-                                    printf("Lo siento! \n no conseguiste la distancia necesaria (%1.2f km) :(\n",dis);
-                                }
-                            } else {
-                                cad2[0] = 'N';
-                                cad2[1] = 'O';
-                                cad2[2] = '\0';
-                                opcion = 2 + strcmp(cad, cad2);
-                                if (opcion == 2) {
-                                    printf("\nEsquivaste el objeto de interes.\nContinuando el viaje \n");
-                                } else {
-                                    printf("Escribe la opcion correcta\n");
+                    }putchar('\n');
+                    if (peligro.dist > 350)
+                        control = 1;
+                    else if (peligro.dist > 200 && peligro.dist < 350 && peligro.vel > 2000)
+                        control = 2;
+                    else if (peligro.dist > 600 && peligro.dist < 900 && peligro.vel < 2000)
+                        control = 3;
+                    else
+                        control = 4;
+                    switch (control) {
+                        case 1:
+                            puntaje[opcion - 1].destruidos += 10;
+                            printf("Estas tan lejos del meteoro que no es necesario esquivarlo o destruirlo.\n Ganaste: 10 asteroides \n");
+                            break;
+                        case 2:
+                            puntaje[opcion - 1].destruidos += 15;
+                            printf("Evadiste con exito al meteoro aunque era arriesgado\n Ganaste: 15 asteroides");
+                            break;
+                        case 3:
+                            printf("Puedes destruir el meteoro, si es asi perderas 40 capsulas por bala.\n");
+                            printf("Escribe 1 para destruir o 0 para esquivar el mteoro:\n=>");
+                            do {  // Validamos la respuesta del usuario
+                                scanf("%s", resp);
+                                opcion = 2;
+                                if (strcmp(resp, "1") == 0 && puntaje[opcion - 1].balas >= 8) {
+                                    aleat1 = rand() % 2 + 8;  // Generando 2 a 8 disparos
+                                    vidaP = aleat1 * 40;      // Se pierden 40 capsulas de vida por cada disparo
+                                    puntaje[opcion - 1].vidas -= vidaP;
+                                    puntaje[opcion - 1].balas -= aleat1 * 20;  // por cada disparo suelta 20 balas
+                                    puntaje[opcion - 1].destruidos += 1; //Contador de destrucciones
+                                    printf("Haz destruido el meteoro con exito\n");
+                                    printf("Los disparos que realizaste fueron %d, por lo tanto te quedan %d balas\n", aleat1, puntaje[opcion - 1].balas);
+                                    printf("Perdiste %d vidas, te quedan %d vidas\n=>", vidaP, puntaje[opcion - 1].vidas);
+                                } else if (strcmp(resp, "1") == 0 && puntaje[opcion - 1].balas < 8)
+                                    printf("NO tienes balas suficientes, por lo tanto se esquiva el meteoro en automatico \n=>");
+                                else if (strcmp(resp, "0") == 0)
+                                    printf("Decidiste esquivar el meteoro\n=>");  // Respuesta negativa
+                                else {
+                                    printf("Escribe la opcion correcta\n=>");  // Si el usuario escribio otro caracter
                                     opcion = 3;
                                 }
+                            } while (opcion == 3);
+                            break;
+                        case 4:
+                            printf("Oh no! El meteoro esta muy cerca, no puedes esquivarlo ni destruirlo...\n""Impactaras en:\n");
+                            for (i = 3; i > 0; i--) {
+                                printf("%d\n", i);
+                                sleep(1);
                             }
-                        } while (opcion == 3);
+                            for (i = 0; i < 3; i++) { //Animacion
+                                printf(".");
+                                fflush(stdout);  // Con esta funcion hacemos que los caracteres se impriman inmediatamente
+                                sleep(1);
+                            }putchar('\n');
+                            // Grafico de bomba
+                            printf("                             ____\n                     __,-~~/~    `---.\n                   _/_,---(      ,    )\n               __ /        <    /   )  \\___\n- ------===;;;'====------------------===;;;===----- -  -\n                  \\/  ~\"~\"~\"~\"~\"~\\~\"~)~\"/\n                  (_ (   \\  (     >    \\)\n                   \\_( _ <         >_>'\n                      ~ `-i' ::>|--\"\n                          I;|.|.|\n                         <|i::|i|`.\n                        (` ^'\" ' \")\n\x1b[31m");
+                            printf("La nave ha chocado de lleno contra el meteoro.\nHas perdido el juego debido a un terrible accidente...\n");
+                            printf("************************  GRACIAS POR JUGAR  ************************\n");
+                            printf("Pulse cualquier tecla para regresar al menu principal\n=>");
+                            sigNivel = 1;
+                            cont = peligrosGen;  // Se le asigna el valor de generados para que se acabe el ciclo for
+                            perder = 1;          // Se usa una bandera para omitir la parte de la busqueda de objetos y el puntaje final
+                            break;
                     }
+                    getch();
+                    putchar('\n');
+                    if (perder != 1) {
+                        aleat2 = ((float)rand() / (float)RAND_MAX) * 4.0;  // Se da un numero random flotante
+                        if (aleat2 <= 2.5 && peligro.vel > 1500 && 3000 < peligro.vel) {
+                            aleat1 = rand() % 6 + 20;                                                    // Generando de 20 a 25 objetos
+                            printf("Te haz encontrado con una cantidad de %d '%s' \n", aleat1, obj[rand() % 7]);  // Se encuentra con varios objetos del mismo tipo
+                            for (i = 0; i < 3; i++) { //Animacion
+                                printf(".");
+                                fflush(stdout);  // Con esta funcion hacemos que los caracteres se impriman inmediatamente
+                                sleep(1);
+                            }putchar('\n');
+                            if (rand() % 2 == 0) {                         // Se da una probabilidad de 50/50 de tomar o destruir los objetos
+                                puntaje[opcion - 1].objetosCap += aleat1;  // Contador de cuantos objetos se han capturado
+                                vidaP = aleat1 * 30;                       // Cada que se toma un objeto se pierden 30 capsulas de vida
+                                puntaje[opcion - 1].vidas -= vidaP;
+                                printf("Te haz quedado con los objetos, a cambio de ello perdiste %d capsulas de vida.\nTe quedan %d capsulas\n", vidaP, puntaje[opcion - 1].vidas);
+                            } else
+                                printf("Haz destruido los objetos.\n");
+                        } else
+                            printf("Encontraste algunos objetos pero desgraciadamente estabas muy lejos de ellos...\n");
+                        printf("Ademas, ya que superaste un meteoro en tu recorido obtienes 12 '%s'! \n=>", obj[rand() % 7]);
+                        puntaje[opcion - 1].objetosCap += 12;
+                        getch();
+                        putchar('\n');
+                    }system("clear");
+                }  // Fin del recorrido de meteoros
+                if (perder != 1) {
+                    printf("Haz sobrevivido a este nivel, veamos tus estadisticas:\n");
+                    printf("Vidas totales: %d \nBalas finales: %d \nAsteroides destruidos: %d \nObjetos Capturados: %d\n=>", puntaje[opcion - 1].vidas, puntaje[opcion - 1].balas, puntaje[opcion - 1].destruidos, puntaje[opcion - 1].objetosCap);
+                    getchar();
+                    if (puntaje[opcion - 1].balas >= 5000 && puntaje[opcion - 1].vidas >= 700 && puntaje[opcion - 1].destruidos >= 100 && puntaje[opcion - 1].objetosCap >= 100) {
+                        printf("Felicidades, Has pasado el nivel con exito! Puedes seguir al siguiente nivel\n=>");
+                        sigNivel++;
+                    } else {
+                        printf("Oh no... No pudiste ganar debido a que te faltaron puntos...\n");
+                        printf("Intentalo de nuevo!\n=>");
+                        sigNivel = 1;
+                    }
+                    getchar();
                 }
-                /*Resultado del juego*/
-                sleep(2);
-                printf("\nVidas totales %d  \n", vida);
-                printf("Balas finales %d \n", balas);
-                printf("Asteroides destruidos %d  \n", contast);
-                if ((balas >= 5000) && (vida >= 700) && (contast >= 100)) {  // Se verifican las condiciones para poder pasar al siguiente nivel
-                    printf("\aFelicidades, Has pasado el nivel con exito! Puedes seguir al siguiente nivel\n");
-                    sleep(2);
-                    signivel++;
-                    opcion = 0;
-                } else {
-                    printf("Oh no... No pudiste ganar debido a que te faltaron puntos...\n");
-                    printf("Intentalo de nuevo!\n");
-                }
+                system("clear");
                 break;
             case 3:
-                sleep(2);
-                printf("\n\n\n/-----------------------------------/\n");
-                printf("/**NIVEL 3:**\n");
-                printf("/-----------------------------------/\n");
-                peligros = rand() % 4 + 10;                    //* genera de 10 a 13 hoyo
-                for (i = 0; i < peligros; i++) {               // Primero se almacenan las distancias y las velocidades de c/hoyo negro con el mismo indice
-                    velN3[i] = 2500 + rand() % (4000 - 2500);  //* de 2500 a 4000 km/h
-                    disN3[i] = rand() % 221 + 330;             // de 330 a 550 km
+                if (sigNivel == 3) {
+                    printf("Ya que has ganado el nivel 1 se mantendra tu vida y tus balas, buena suerte!\n");
+                    puntaje = (struct bitacora *)realloc(puntaje, 1 * sizeof(struct bitacora));
+                    puntaje[opcion - 1].objetosCap = 0;
+                    puntaje[opcion - 1].destruidos = 0;
+                    puntaje[opcion - 1].balas = puntaje[1].balas;
+                    puntaje[opcion - 1].vidas = puntaje[1].vidas;
                 }
-                printf("\nCruzaras %d Hoyos Negros \n", peligros);
-                for (i = 0; i < peligros; i++) {
-                    if (disN3[i] >= 500) {  // Verifica que caso es, antes de entrar en switch(opc)
-                        opc = '1';
-                    } else {
-                        if (disN3[i] > 350 && disN3[i] < 500) {
-                            if (velN3[i] > 3000) {
-                                opc = '2';
-                            } else {
-                                opc = '3';
-                            }
-                        } else {
-                            opc = '4';
-                        }
-                    }
-                    sleep(2);
-                    printf("\n*************************\n Hoyo Negro: %d \n", i + 1);
-                    sleep(3);
-                    switch (opc) {
-                        case '1':
-                            printf("\nTe desviaste el Hoyo Negro %d, ya que tu distancia entre tu y el hoyo fue de %d km \n ", i + 1, disN3[i]);
-                            break;
-                        case '2':
-                            printf("\nEvadiste el hoyo negro %d tu distancia fue %d km y tu velocidad fue de %1.0f km/h \n ", i + 1, disN3[i], velN3[i]);
-                            break;
-                        case '3':
-                            printf(" \nPuedes destruir el Hoyo Negro \n Tu distancia fue %d km \n Tu velocidad alcanzada fue de %1.0f km/h \n", disN3[i], velN3[i]);
-                            printf("Escriba 'SI' para destruir o 'NO' para evadirlo \n");
-                            do {
-                                scanf("%s", cad);
-                                cad1[0] = 'S';
-                                cad1[1] = 'I';
-                                cad1[2] = '\0';
-                                opcion = 1 + strcmp(cad, cad1);
-                                if (opcion == 1) {
-                                    printf("\nAtacaras el hoyo negro \n");
-                                    sleep(2);
-                                    if (balas >= 25 && vida >= 250) {
-                                        aleat1 = 5 + rand() % (10 - 5);  // Generando de 5 a 9 disparos
-                                        balas -= aleat1 * 5;             // Por cada disparo perderas 5 balas
-                                        vidap = aleat1 * 50;
-                                        vida -= vidap;
-                                        contho++;  // Contador de hoyos negros destruidos
-                                        printf("Destruiste el hoyo negro \n");
-                                        printf("Realizaste %d disparos\n",aleat1);
-                                        sleep(1);
-                                        printf("Perdiste: \n %d Balas\n  %d Vida \n", aleat1 * 5, vidap);
-                                        sleep(1);
-                                        printf("------\nTe quedan:\n%d Balas\n%d Vida \n", balas, vida);
-                                    } else {
-                                        printf("Insuficiente de balas o vida \n");
-                                    }
-
-                                } else {
-                                    cad2[0] = 'N';
-                                    cad2[1] = 'O';
-                                    cad2[2] = '\0';
-                                    opcion = 2 + strcmp(cad, cad2);
-                                    if (opcion == 2) {
-                                        printf("Decidiste no destruir el hoyo negro \n");
-                                    } else {
-                                        printf("Escribe la opcion correcta\n");
-                                        opcion = 3;
-                                    }
-                                }
-                            } while (opcion == 3);
-                            break;
-                        case '4':
-                            printf(" Tu distancia fue %d km \n", disN3[i]);
-                            sleep(2);
-                            printf("No pudiste esquivar el Hoyo Negro, distancia insuficiente \nImpactaras en: \n");
-                            printf("3\n");
-                            sleep(1);
-                            printf("2\n");
-                            sleep(1);
-                            printf("1\n");
-                            sleep(1);
-                            printf("...\n");
-                            sleep(4);
-                            // Grafico de bomba
-                            printf("                             ____\n                     __,-~~/~    `---.\n                   _/_,---(      ,    )\n               __ /        <    /   )  \\___\n- ------===;;;'====------------------===;;;===----- -  -\n                  \\/  ~\"~\"~\"~\"~\"~\\~\"~)~\"/\n                  (_ (   \\  (     >    \\)\n                   \\_( _ <         >_>'\n                      ~ `-i' ::>|--\"\n                          I;|.|.|\n                         <|i::|i|`.\n                        (` ^'\" ' \")\n");
-                            printf("Has perdido el juego :c\n");
-
-                            return 0;
-                    }
-                    if ((i % 4) == 0) {  // Los objetos aparecen solo si i es multiplo de 4
-                        printf("\n °° Te has encontrado un objeto de interes \n");
-                        printf("Escriba 'SI' para destruir o 'NO' para evadirlo \n");
-                        do {
-                            scanf("%s", cad);
-                            cad1[0] = 'S';
-                            cad1[1] = 'I';
-                            cad1[2] = '\0';
-                            opcion = 1 + strcmp(cad, cad1);
-                            if (opcion == 1) {
-                                disO = rand() % 5;
-                                if (disO >= 0 && disO <= 3) {
-                                    printf("Ohh!!!!!, has perdiste 70 capsulas de vida \nGanaste 15 balas \n");
-                                    vida -= 70;
-                                    balas += 15;
-                                } else {
-                                    printf("Lo siento no alcanzaste la distancia necesaria (%d km)\n",disO);
-                                }
-                            } else {
-                                cad2[0] = 'N';
-                                cad2[1] = 'O';
-                                cad2[2] = '\0';
-                                opcion = 2 + strcmp(cad, cad2);
-                                if (opcion == 2) {
-                                    printf("Decidiste no destruir el objeto de interes \n");
-                                } else {
-                                    printf("Escribe la opcion correcta\n");
+                printf("Iniciando nivel 3...\n");
+                sleep(3);
+                printf("/-----------------------------------/\n");
+                printf("/**NIVEL 3:**\n");  // Nivel 3
+                printf("/-----------------------------------/\n");
+                peligrosGen = rand() % 3 + 10;  //Generando de 10 a 12 agujeros negros
+                printf("Cruzaras %d Hoyos Negros en este nivel, ten mucho cuidado!\n", peligrosGen);
+                sleep(3);
+                for (cont = 1; cont <= peligrosGen; cont++) {
+                    peligro.vel = rand() % 4701 + 300;                         // Velocidad desde 300 a 5000 km/h (Pendiente)
+                    peligro.dist = rand() % 1500 + 1;                          // Genera una distancia entre 1 y 1500 km (Pendiente)
+                    printf("**********************************************************************************\n");
+                    printf("*                               BITACORA DEL VIAJE                               *\n");
+                    printf("**********************************************************************************\n");
+                    printf("| Hoyos Negros avistados: %5d hoyo negro                                           |\n", cont);
+                    printf("| Hoyos Negros destruidos: %5d                                                     |\n", puntaje[opcion - 1].destruidos);
+                    printf("| Capsulas de la nave: %5d capsulas                                            |\n", puntaje[opcion - 1].vidas);
+                    printf("| Balas restantes: %5d balas                                                   |\n", puntaje[opcion - 1].balas);
+                    printf("| Objetos capturados: %5d objetos                                              |\n", puntaje[opcion - 1].objetosCap);
+                    printf("**********************************************************************************\n=>\n");
+                    getch();
+                    putchar('\n');
+                    printf("**********************************************************************************\n");
+                    printf("*                            ENCONTRASTE UN HOYO NEGRO                           *\n");
+                    printf("**********************************************************************************\n");
+                    printf("| Velocidad actual: %5.0d km/h                                                   |\n", peligro.vel);
+                    printf("| Distancia con el hoyo negro: %5.0d kilometros                                  |\n", peligro.dist);
+                    printf("**********************************************************************************\n=>\n");
+                    getch();
+                    putchar('\n');      
+                    printf("Encontraste un agujero negro\n");
+                    printf("************************  Velocidad actual: %1.0d km/h  ************************\n", peligro.vel);
+                    printf("************************  Distancia con el agujero negro: %1.0d kilometros  ************************\n=>", peligro.dist);
+                    getch();
+                    putchar('\n');
+                    printf("El agujero negro se aproxima a ti, analizaremos que podemos hacer\n");
+                    printf("************************  Analizando las condiciones con el agujero negro...  ************************\n");
+                    for (i = 0; i < 3; i++) { //Animacion
+                        printf(".");
+                        fflush(stdout);  // Con esta funcion hacemos que los caracteres se impriman inmediatamente
+                        sleep(1);
+                    }putchar('\n');
+                    if ((peligro.dist > 900 && peligro.dist < 1500) && peligro.vel < 3000) //Condiciones agujero negro
+                        control = 1;
+                    else if ((peligro.dist > 350 && peligro.dist < 500) && peligro.vel > 3000)
+                        control = 2;
+                    else if (peligro.dist > 500)
+                        control = 3;
+                    else
+                        control = 4;
+                    switch (control) {
+                        case 1:
+                            printf("Puedes destruir el agujero negro si es que lo desea, perdera 30 capsulas por cada bala disparada\n");
+                            printf("Escriba 1 para destruir o 0 para esquivar el agujero negro:\n=>");
+                            opcion = 3;
+                            while (opcion == 3) {  // Validamos la respuesta del usuario
+                                scanf("%s", resp);
+                                opcion = 2;
+                                if (strcmp(resp, "1") == 0 && puntaje[opcion - 1].balas >= 8) {
+                                    aleat1 = rand() %5  + 8;  // Generando 8 a 12 disparos
+                                    vidaP = aleat1 * 30; //Por cada disparo se pierden 30 de vida
+                                    puntaje[opcion - 1].vidas -= vidaP; //Se resta la vida
+                                    puntaje[opcion - 1].balas -= aleat1*20; //Se pierden  20 balas por cada disparo 
+                                    puntaje[opcion - 1].destruidos += 1; // Contador de de agujeros negros destruidos
+                                    printf("Haz destruido el agujero negro con exito\n");
+                                    printf("Los disparos que realizaste fueron %d, por lo tanto te quedan %d balas\n", aleat1, puntaje[opcion - 1].balas);
+                                    printf("Perdiste %d vidas, te quedan %d vidas\n=>", vidaP, puntaje[opcion - 1].vidas);
+                                } else if (strcmp(resp, "1") == 0 && puntaje[opcion - 1].balas < 8)
+                                    printf("NO tienes balas suficientes, por lo tanto se esquiva el agujero negro en automatico \n=>");
+                                else if (strcmp(resp, "0") == 0)
+                                    printf("Decidiste esquivar el agujero negro, aunque era muy riesgoso...\n=>");  // Respuesta negativa
+                                else {
+                                    printf("Escribe la opcion correcta\n=>");  // Si el usuario escribio otro caracter
                                     opcion = 3;
                                 }
                             }
-                        } while (opcion == 3);
+                            break;
+                        case 2:
+                            printf("Evadiste con exito al hoyo negro aunque era arriesgado\n");
+                            printf("Se evadio el hoyo negro %d tu distancia fue %d km y tu velocidad fue de %1.0d km/h \n=> ", cont, peligro.dist, peligro.vel);
+                            break;
+                        case 3:
+                            printf("Estas tan lejos del agujero negro que no es necesario esquivarlo o destruirlo. Sigues tu ruta sin problemas\n=>");
+                            break;
+                        case 4:
+                            printf("Oh no! La distancia es insuficiente para esquivar o destruir el agujero negro!\n");
+                            printf("Seras tragado por el agujero negro, preparate para ello...\n=>");
+                            getchar();
+                            printf("Entraras al horizonte de sucesos en:\n");
+                            for (i = 3; i > 0; i--) {
+                                printf("%d\n", i);
+                                sleep(1);
+                            }
+                            for (i = 0; i < 3; i++) { //Animacion espera
+                                printf(".");
+                                fflush(stdout);  // Con esta funcion hacemos que los caracteres se impriman inmediatamente
+                                sleep(1);
+                            }putchar('\n');
+                            // Grafico de bomba
+                            printf("                             ____\n                     __,-~~/~    `---.\n                   _/_,---(      ,    )\n               __ /        <    /   )  \\___\n- ------===;;;'====------------------===;;;===----- -  -\n                  \\/  ~\"~\"~\"~\"~\"~\\~\"~)~\"/\n                  (_ (   \\  (     >    \\)\n                   \\_( _ <         >_>'\n                      ~ `-i' ::>|--\"\n                          I;|.|.|\n                         <|i::|i|`.\n                        (` ^'\" ' \")\n\x1b[31m");
+                            printf("La nave ha sido tragada y despedazada por el agujero negro.\nHas perdido el juego debido a un terrible accidente...\n");
+                            printf("************************  GRACIAS POR JUGAR  ************************\n");
+                            printf("Pulse enter para regresar al menu principal\n=>");
+                            sigNivel = 1;
+                            cont = peligrosGen;  // Se le asigna el valor de generados para que se acabe el ciclo for
+                            perder = 1;          // Se usa una bandera para omitir la parte de la busqueda de objetos y el puntaje final
+                            break;
                     }
+                    getch();
+                    putchar('\n');
+                    if (perder != 1) {
+                        if (aleat2 <= 3 && (peligro.vel > 4000 && 5000 < peligro.vel)) {
+                            aleat1 = rand() % 51 + 100;                                                           // Genera de 100 a 150 objetos
+                            printf("Te haz encontrado con una cantidad de %d '%s' \n", aleat1, obj[rand() % 7]);  // Se encuentra con varios objetos del mismo tipo
+                            sleep(3);
+                            if (rand() % 2 == 0) {
+                                puntaje[opcion - 1].objetosCap += aleat1;  // Contador de cuantos objetos se han capturado
+                                vidaP = aleat1 * 40;                       // Cada que se toma un objeto se pierden 40 capsulas de vida
+                                puntaje[opcion - 1].vidas -= vidaP;
+                                printf("Te haz quedado con los objetos, a cambio de ello perdiste %d capsulas de vida.\nTe quedan %d capsulas\n", vidaP, puntaje[opcion - 1].vidas);
+                            } else
+                                printf("Haz destruido el objeto\n");
+                        } else
+                            printf("Encontraste un objeto pero desgraciadamente estabas muy lejos de el...\n");
+                        printf("Ademas, ya que superaste un planeta en tu recorido obtienes 80 '%s'! \n=>", obj[rand() % 7]);
+                        puntaje[opcion - 1].objetosCap += 80;
+                        getch();
+                        putchar('\n');
+                    }system("clear");
                 }
-                // Resultados
-                printf("Quedaste con %d balas\n", balas);
-                printf("Quedaste con %d vida\n", vida);
-                printf("Destruiste %d hoyos negros\n", contho);
-                if (balas >= 3000 && vida >= 300 && contho >= 3) {
-                    printf(" Felicidades! Cruzaste el nivel 3\n");
-                    // Letrero de felicidades en ASCII
-                    printf("   ___   _   _  _   _   ___ _____ ___ \n  / __| /_\\ | \\| | /_\\ / __|_   _| __|\n | (_ |/ _ \\| .` |/ _ \\\\__ \\ | | | _| \n  \\___/_/ \\_\\_|\\_/_/ \\_\\___/ |_| |___|\n");
-                } else {
-                    printf("No cruzaste el nivel 3 ;c \n");
+                if (perder != 1) {
+                    printf("Haz sobrevivido a este nivel, veamos tus estadisticas:\n");
+                    printf("Vidas totales: %d\nBalas finales: %d\nAgujeros negros destruidos: %d\nObjetos capturados: %d\n=>", puntaje[opcion - 1].vidas, puntaje[opcion - 1].balas, puntaje[opcion - 1].destruidos, puntaje[opcion - 1].objetosCap);
+                    getch();
+                    putchar('\n');
+                    if (puntaje[opcion - 1].balas >= 3000 && puntaje[opcion - 1].vidas >= 300 && puntaje[opcion - 1].destruidos >= 3 && puntaje[opcion - 1].objetosCap >= 1000){
+                        printf(" Felicidades! Cruzaste el nivel 3\n");
+                        // Letrero de felicidades en ASCII
+                        printf("   ___   _   _  _   _   ___ _____ ___ \n  / __| /_\\ | \\| | /_\\ / __|_   _| __|\n | (_ |/ _ \\| .` |/ _ \\\\__ \\ | | | _| \n  \\___/_/ \\_\\_|\\_/_/ \\_\\___/ |_| |___|\n");
+                        printf("**********************************************************************************\n");
+                        printf("*                               BITACORA DEL TODO EL VIAJE                       *\n");
+                        printf("**********************************************************************************\n");
+                        for (i = 0; i < 3; i++) {
+                            if (i == 0)
+                                printf("| Planetas destruidos: %5d                                                     |\n", puntaje[i].destruidos);
+                            else if (i == 1)
+                                printf("| Asteroides destruidos: %5d                                                     |\n", puntaje[i].destruidos);
+                            else
+                                printf("| Hoyos Negros destruidos: %5d                                                     |\n", puntaje[i].destruidos);
+                            printf("| Capsulas de la nave: %5d capsulas                                            |\n", puntaje[i].vidas);
+                            printf("| Balas restantes: %5d balas                                                   |\n", puntaje[i].balas);
+                            printf("| Objetos capturados: %5d objetos                                              |\n", puntaje[i].objetosCap);
+                            printf("**********************************************************************************\n=>\n");
+                            printf("Gracias por jugar!  :)");
+                            printf("Pulse una tecla para continuar...");
+                            getch();
+                            putchar('\n');
+                            return 0;
+                        }
+                    } else {
+                        printf("Oh no... No pudiste ganar debido a que te faltaron puntos...\n");
+                        printf("Intentalo de nuevo!\n=>");
+                        sigNivel = 1;
+                    }
+                    system("clear");
                 }
                 break;
             case 4:
-                printf("Saliendo del juego....\n");
-                break;
-            default:
-                opcion = 0;
-                printf("Por favor escribe una opcion disponible\n");
+                printf("Cerrando el juego, esperamos que hayas disfrutado jugando! :)\n");
+                printf("Pulse cualquier tecla para continuar . . .");
+                getch();
         }
-    } while (opcion == 0);
+    } while (opcion != 4);
     return 0;
 }
